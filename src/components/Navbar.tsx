@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Globe, Menu, Moon, Sun, X } from 'lucide-react';
+import { Globe, LayoutDashboard, Menu, Moon, ShieldCheck, Sun, X } from 'lucide-react';
 import { useApp } from '../context/AppContext.tsx';
 import { AnidocLogo } from './AnidocLogo.tsx';
 
 export const Navbar: React.FC = () => {
-  const { language, toggleLanguage, theme, toggleTheme, t } = useApp();
+  const { language, toggleLanguage, theme, toggleTheme, t, auth } = useApp();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const showOwnerSetup = !auth.ownerExists;
+  const showOwnerDashboard = auth.authenticated && Boolean(auth.user);
 
   const navLinks = [
     { to: '/documentaries', label: t.nav.documentaries },
@@ -47,7 +50,31 @@ export const Navbar: React.FC = () => {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {showOwnerSetup && (
+            <Link
+              to="/owner/setup"
+              className="inline-flex min-h-[40px] items-center gap-1.5 rounded-sm border border-[#A47A2C]/50 dark:border-[#D4AF62]/50 bg-[#D4AF62]/15 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-[#171717] dark:text-[#D4AF62] hover:bg-[#D4AF62]/25 transition-colors whitespace-nowrap shrink-0"
+              aria-label={t.nav.ownerSetup}
+              title={t.nav.ownerSetup}
+            >
+              <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <span className="hidden sm:inline">{t.nav.ownerSetup}</span>
+            </Link>
+          )}
+
+          {showOwnerDashboard && (
+            <Link
+              to="/owner"
+              className="inline-flex min-h-[40px] items-center gap-1.5 rounded-sm bg-[#171717] dark:bg-[#D4AF62] px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-[#FFFFFF] dark:text-[#090909] hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
+              aria-label={t.nav.ownerDashboard}
+              title={t.nav.ownerDashboard}
+            >
+              <LayoutDashboard className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <span className="hidden sm:inline">{t.nav.ownerDashboard}</span>
+            </Link>
+          )}
+
           <button
             type="button"
             onClick={toggleLanguage}
@@ -110,6 +137,24 @@ export const Navbar: React.FC = () => {
                 {item.label}
               </NavLink>
             ))}
+            {showOwnerSetup && (
+              <NavLink
+                to="/owner/setup"
+                onClick={() => setMobileOpen(false)}
+                className="py-3 text-sm font-semibold text-[#A47A2C] dark:text-[#D4AF62]"
+              >
+                {t.nav.ownerSetup}
+              </NavLink>
+            )}
+            {showOwnerDashboard && (
+              <NavLink
+                to="/owner"
+                onClick={() => setMobileOpen(false)}
+                className="py-3 text-sm font-semibold text-[#A47A2C] dark:text-[#D4AF62]"
+              >
+                {t.nav.ownerDashboard}
+              </NavLink>
+            )}
           </nav>
         </div>
       )}

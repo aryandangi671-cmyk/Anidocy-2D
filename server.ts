@@ -235,7 +235,7 @@ app.post('/api/auth/setup-owner', (req, res) => {
   };
 
   const token = signSessionToken({ id: createdUser.id, role: 'owner' });
-  setSessionCookie(res, token);
+  setSessionCookie(res, token, req);
 
   writeAuditLog({
     actorId: createdUser.id,
@@ -290,7 +290,7 @@ app.post('/api/auth/login', (req, res) => {
 
   db.prepare(`UPDATE users SET last_login_at = datetime('now') WHERE id = ?`).run(row.id);
   const token = signSessionToken({ id: row.id, role: row.role });
-  setSessionCookie(res, token);
+  setSessionCookie(res, token, req);
 
   writeAuditLog({
     actorId: row.id,
@@ -316,7 +316,7 @@ app.post('/api/auth/login', (req, res) => {
 
 app.post('/api/auth/logout', (req, res) => {
   const user = getAuthenticatedUser(req);
-  clearSessionCookie(res);
+  clearSessionCookie(res, req);
   if (user) {
     writeAuditLog({
       actorId: user.id,
@@ -583,7 +583,7 @@ app.get('/api/admin/videos', requireAuth, (_req, res) => {
   res.json({ videos });
 });
 
-app.post('/api/admin/videos', requireAuth, (req: AuthedRequest, res) => {
+app.post('/api/admin/videos', requireAuth, requireOwner, (req: AuthedRequest, res) => {
   const youtubeUrlInput = String(req.body?.youtube_url || '').trim();
   const titleEn = String(req.body?.title_en || '').trim();
   const titleHi = String(req.body?.title_hi || '').trim();
@@ -675,7 +675,7 @@ app.post('/api/admin/videos', requireAuth, (req: AuthedRequest, res) => {
   res.status(201).json({ video: created });
 });
 
-app.put('/api/admin/videos/:id', requireAuth, (req: AuthedRequest, res) => {
+app.put('/api/admin/videos/:id', requireAuth, requireOwner, (req: AuthedRequest, res) => {
   const id = Number(req.params.id);
   const existing = db.prepare(`SELECT * FROM videos WHERE id = ?`).get(id) as
     | { id: number; status: string; published_at: string | null; custom_thumbnail_url: string | null; is_demo: number }
@@ -770,7 +770,7 @@ app.put('/api/admin/videos/:id', requireAuth, (req: AuthedRequest, res) => {
   res.json({ video: updated });
 });
 
-app.patch('/api/admin/videos/:id/status', requireAuth, (req: AuthedRequest, res) => {
+app.patch('/api/admin/videos/:id/status', requireAuth, requireOwner, (req: AuthedRequest, res) => {
   const id = Number(req.params.id);
   const status = req.body?.status === 'published' ? 'published' : 'draft';
   const existing = db.prepare(`SELECT id, title_en, title_hi, published_at FROM videos WHERE id = ?`).get(id) as
@@ -801,7 +801,7 @@ app.patch('/api/admin/videos/:id/status', requireAuth, (req: AuthedRequest, res)
   res.json({ ok: true, status });
 });
 
-app.post('/api/admin/videos/reorder', requireAuth, (req: AuthedRequest, res) => {
+app.post('/api/admin/videos/reorder', requireAuth, requireOwner, (req: AuthedRequest, res) => {
   const orders = Array.isArray(req.body?.orders)
     ? (req.body.orders as Array<{ id: number; display_order: number }>)
     : [];
@@ -821,7 +821,7 @@ app.post('/api/admin/videos/reorder', requireAuth, (req: AuthedRequest, res) => 
   res.json({ ok: true });
 });
 
-app.post('/api/admin/videos/:id/move-to-top', requireAuth, (req: AuthedRequest, res) => {
+app.post('/api/admin/videos/:id/move-to-top', requireAuth, requireOwner, (req: AuthedRequest, res) => {
   const id = Number(req.params.id);
   const target = db.prepare(`SELECT id, title_en, title_hi FROM videos WHERE id = ?`).get(id) as
     | { id: number; title_en: string; title_hi: string }
@@ -862,7 +862,7 @@ app.post('/api/admin/videos/:id/move-to-top', requireAuth, (req: AuthedRequest, 
   res.json({ ok: true });
 });
 
-app.delete('/api/admin/videos/:id', requireAuth, (req: AuthedRequest, res) => {
+app.delete('/api/admin/videos/:id', requireAuth, requireOwner, (req: AuthedRequest, res) => {
   const id = Number(req.params.id);
   const existing = db
     .prepare(`SELECT id, title_en, title_hi, custom_thumbnail_url, is_demo FROM videos WHERE id = ?`)
@@ -891,7 +891,7 @@ app.delete('/api/admin/videos/:id', requireAuth, (req: AuthedRequest, res) => {
   res.json({ ok: true });
 });
 
-app.post('/api/admin/videos/delete-demos', requireAuth, (req: AuthedRequest, res) => {
+app.post('/api/admin/videos/delete-demos', requireAuth, requireOwner, (req: AuthedRequest, res) => {
   const ids = Array.isArray(req.body?.ids) ? req.body.ids.map((n: unknown) => Number(n)).filter(Boolean) : [];
   if (ids.length === 0) {
     res.status(400).json({ error: 'No demo video IDs selected.' });
@@ -1059,7 +1059,7 @@ app.get('/api/admin/media', requireAuth, (_req, res) => {
   res.json({ assets });
 });
 
-app.post('/api/admin/media', requireAuth, (req: AuthedRequest, res) => {
+app.post('/api/admin/media', requireAuth, requireOwner, (req: AuthedRequest, res) => {
   upload.single('file')(req, res, (err) => {
     if (err) {
       res.status(400).json({ error: err.message || 'Upload failed.' });
@@ -1103,7 +1103,7 @@ app.post('/api/admin/media', requireAuth, (req: AuthedRequest, res) => {
   });
 });
 
-app.delete('/api/admin/media/:id', requireAuth, (req: AuthedRequest, res) => {
+app.delete('/api/admin/media/:id', requireAuth, requireOwner, (req: AuthedRequest, res) => {
   const id = Number(req.params.id);
   const asset = db.prepare(`SELECT * FROM media_library WHERE id = ?`).get(id) as
     | { id: number; filename: string; url: string; original_name: string }

@@ -12,6 +12,8 @@ export const UI_COPY = {
       about: 'About',
       contact: 'Contact',
       ownerPortal: 'Owner Portal',
+      ownerSetup: 'Owner Setup',
+      ownerDashboard: 'Owner Dashboard',
     },
     controls: {
       languageLabel: 'Language',
@@ -147,6 +149,8 @@ export const UI_COPY = {
       about: 'हमारे बारे में',
       contact: 'संपर्क',
       ownerPortal: 'ओनर पोर्टल',
+      ownerSetup: 'ओनर सेटअप',
+      ownerDashboard: 'ओनर डैशबोर्ड',
     },
     controls: {
       languageLabel: 'भाषा',

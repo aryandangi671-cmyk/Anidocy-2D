@@ -6,7 +6,7 @@ import { db, getDataDir, writeAuditLog } from './db.ts';
 import type { AuthUser, UserRole } from '../src/types/anidoc.ts';
 
 export const SESSION_COOKIE_NAME = 'anidoc_session';
-const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
+const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 days persistent Owner session
 
 function getSessionSecret(): string {
   if (process.env.SESSION_SECRET && process.env.SESSION_SECRET.length >= 32) {
@@ -72,21 +72,31 @@ export function verifySessionToken(token: string | undefined): SessionPayload | 
   }
 }
 
-export function setSessionCookie(res: Response, token: string): void {
+function cookieSecurityOptions(req?: Request): { sameSite: 'none' | 'lax'; secure: boolean } {
+  const isHttps =
+    Boolean(req?.secure) ||
+    req?.headers['x-forwarded-proto'] === 'https' ||
+    process.env.NODE_ENV === 'production';
+  return isHttps ? { sameSite: 'none', secure: true } : { sameSite: 'lax', secure: false };
+}
+
+export function setSessionCookie(res: Response, token: string, req?: Request): void {
+  const sec = cookieSecurityOptions(req);
   res.cookie(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: sec.sameSite,
+    secure: sec.secure,
     maxAge: SESSION_TTL_MS,
     path: '/',
   });
 }
 
-export function clearSessionCookie(res: Response): void {
+export function clearSessionCookie(res: Response, req?: Request): void {
+  const sec = cookieSecurityOptions(req);
   res.clearCookie(SESSION_COOKIE_NAME, {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: sec.sameSite,
+    secure: sec.secure,
     path: '/',
   });
 }

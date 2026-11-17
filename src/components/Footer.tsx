@@ -5,11 +5,13 @@ import { useApp } from '../context/AppContext.tsx';
 import { AnidocLogo } from './AnidocLogo.tsx';
 
 export const Footer: React.FC = () => {
-  const { language, t, settings } = useApp();
+  const { language, t, settings, auth } = useApp();
   const channelUrl = settings?.youtube_channel_url || 'https://youtube.com/@anidocemedia?si=rcoYZaWMGqJ7c7na';
   const showContact = settings?.show_public_contact === '1';
   const contactName = settings?.public_contact_name || '';
   const contactMobile = settings?.public_contact_mobile || '';
+  const showOwnerSetup = !auth.ownerExists;
+  const showOwnerDashboard = auth.authenticated && Boolean(auth.user);
 
   return (
     <footer className="border-t border-[#171717]/10 dark:border-[#F4F1EB]/10 bg-[#E9E6DF]/55 dark:bg-[#151515]">
@@ -114,6 +116,26 @@ export const Footer: React.FC = () => {
                   {t.pages.termsTitle}
                 </Link>
               </li>
+              {showOwnerSetup && (
+                <li>
+                  <Link
+                    to="/owner/setup"
+                    className="font-semibold text-[#A47A2C] dark:text-[#D4AF62] hover:underline transition-colors"
+                  >
+                    {t.nav.ownerSetup}
+                  </Link>
+                </li>
+              )}
+              {showOwnerDashboard && (
+                <li>
+                  <Link
+                    to="/owner"
+                    className="font-semibold text-[#A47A2C] dark:text-[#D4AF62] hover:underline transition-colors"
+                  >
+                    {t.nav.ownerDashboard}
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
         </div>
