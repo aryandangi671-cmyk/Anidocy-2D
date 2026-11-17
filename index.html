@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ANIDOC 2D — Documentaries, Mysteries & Real Stories</title>
+    <meta
+      name="description"
+      content="ANIDOC 2D is an editorial 2D documentary platform exploring historical discoveries, unsolved mysteries, and research-based real stories in Hindi and English."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ANIDOC 2D" />
+    <meta property="og:title" content="ANIDOC 2D — Documentaries, Mysteries & Real Stories" />
+    <meta
+      property="og:description"
+      content="Explore cinematic 2D-animated documentaries, historical discoveries, mysteries, and research-driven real stories on ANIDOC 2D."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ANIDOC 2D — Documentaries, Mysteries & Real Stories" />
+    <meta
+      name="twitter:description"
+      content="Explore cinematic 2D-animated documentaries, historical discoveries, mysteries, and research-driven real stories on ANIDOC 2D."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Serif+Devanagari:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('anidoc_theme');
+          if (saved === 'light') {
+            document.documentElement.classList.remove('dark');
+          } else {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="bg-[#F7F5F0] text-[#171717] dark:bg-[#090909] dark:text-[#F4F1EB] antialiased selection:bg-[#D4AF62]/30 selection:text-current">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

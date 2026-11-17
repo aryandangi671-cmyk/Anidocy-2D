@@ -1,0 +1,6 @@
+{
+  "name": "ANIDOC 2D",
+  "description": "Cinematic 2D-animated documentaries, historical discoveries, mysteries, and research-based real stories in Hindi and English.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
